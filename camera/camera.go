@@ -136,10 +136,7 @@ func scanLine(c *Camera, j int, world *hittable.Hittable, ch chan Pixel) {
 
 func (c *Camera) initialize() {
 	// Calculate the image height, and ensure that it's at least 1.
-	c.imageHeight = int(float64(c.imageWidth) / c.aspectRatio)
-	if c.imageHeight < 1 {
-		c.imageHeight = 1
-	}
+	c.imageHeight = max(int(float64(c.imageWidth)/c.aspectRatio), 1)
 
 	c.pixelSamplesScale = 1.0 / float64(c.samplesPerPixel)
 
