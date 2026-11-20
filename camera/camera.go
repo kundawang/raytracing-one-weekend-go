@@ -59,24 +59,40 @@ func NewCamera(
 }
 
 func (c Camera) Render(world hittable.Hittable) {
+	// initialize first so the header reports the real image height;
+	// RenderToPixels re-initializes its own value copy, which is harmless.
 	c.initialize()
+	image := c.RenderToPixels(world)
 
 	fmt.Print("P3\n", c.imageWidth, " ", c.imageHeight, "\n255\n")
+	for _, el := range image {
+		vec.WriteColor(*os.Stdout, el)
+	}
+
+	println("\rDone.			\n")
+}
+
+// RenderToPixels runs the deterministic single-threaded renderer and returns
+// the accumulated, sample-scaled color of every pixel in scanline order. It
+// performs no I/O, which makes list-vs-BVH output comparisons testable.
+func (c Camera) RenderToPixels(world hittable.Hittable) []vec.Color {
+	c.initialize()
+
+	pixelCount := c.imageHeight * c.imageWidth
+	image := make([]vec.Color, pixelCount)
 
 	for j := range c.imageHeight {
-		println("\nScanlines remaining: ", c.imageHeight-j, " ")
 		for i := range c.imageWidth {
 			pixelColor := vec.NewColor(0, 0, 0)
 			for range c.samplesPerPixel {
 				ray := c.getRay(i, j)
 				pixelColor = pixelColor.Add(rayColor(ray, c.maxDepth, world))
 			}
-
-			vec.WriteColor(*os.Stdout, pixelColor.Multiply(c.pixelSamplesScale))
+			image[j*c.imageWidth+i] = pixelColor.Multiply(c.pixelSamplesScale)
 		}
 	}
 
-	println("\rDone.			\n")
+	return image
 }
 
 type Pixel struct {

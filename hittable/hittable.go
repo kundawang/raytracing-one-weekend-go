@@ -45,4 +45,8 @@ func (h *HitRecord) SetFaceNormal(ray ray.Ray, outwardNormal vec.Vec3) error {
 
 type Hittable interface {
 	Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool)
+	// Bound returns the finite axis-aligned bounding box of the primitive.
+	// ok is false for unbounded or non-finite primitives, which cannot be
+	// inserted into a BVH.
+	Bound() (box AABB, ok bool)
 }

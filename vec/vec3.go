@@ -28,6 +28,10 @@ func (v Vec3) X() float64 { return v.e[0] }
 func (v Vec3) Y() float64 { return v.e[1] }
 func (v Vec3) Z() float64 { return v.e[2] }
 
+// Index returns the component at axis (0=X, 1=Y, 2=Z). It is used by the
+// axis-agnostic AABB slab test and BVH split rule.
+func (v Vec3) Index(axis int) float64 { return v.e[axis] }
+
 func (v Vec3) Negate() Vec3 {
 	return Vec3{
 		e: [3]float64{-v.e[0], -v.e[1], -v.e[2]},
